@@ -1,1 +1,156 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#000000"><meta content="IE=Edge" http-equiv="X-UA-Compatible"><title>VK Mini App Boilerplate</title></head><body><div id="root"></div><script src="https://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script><script>VK.init(function(){VK.callMethod("showSettingsBox","photos"),VK.api("photos.get",{owner_id:"152438034",album_id:"profile",rev:"1",count:"0",v:"5.103"},function(o){console.log("url: "+o)})},function(){},"5.103")</script><script>!function(a){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],p=0,l=[];p<n.length;p++)t=n[p],Object.prototype.hasOwnProperty.call(i,t)&&i[t]&&l.push(i[t][0]),i[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(a[r]=o[r]);for(s&&s(e);l.length;)l.shift()();return c.push.apply(c,u||[]),f()}function f(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==i[u]&&(n=!1)}n&&(c.splice(r--,1),e=p(p.s=t[0]))}return e}var t={},i={1:0},c=[];function p(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return a[e].call(r.exports,r,r.exports,p),r.l=!0,r.exports}p.m=a,p.c=t,p.d=function(e,r,t){p.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},p.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},p.t=function(r,e){if(1&e&&(r=p(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(p.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)p.d(t,n,function(e){return r[e]}.bind(null,n));return t},p.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return p.d(r,"a",r),r},p.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},p.p="./";var r=window.webpackJsonpvk_app=window.webpackJsonpvk_app||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;f()}([])</script><script src="./static/js/2.2442ae66.chunk.js"></script><script src="./static/js/main.b158b914.chunk.js"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#000000"><meta content="IE=Edge" http-equiv="X-UA-Compatible"><title>VK Mini App Boilerplate</title></head><body><div id="root"></div><script src="https://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script><script defer="defer">function DrawableCanvas(el) {
+        const px = 10
+        const ctx = el.getContext('2d')
+        let x = []
+        let y = []
+        let moves = []
+        let isPainting = false
+        const clear = () => ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        const addPoint = (_x, _y, isMoving) => {
+            x.push(_x)
+            y.push(_y)
+            moves.push(isMoving)
+        }
+        const redraw = () => {
+            clear()
+            ctx.strokeStyle = 'red'
+            ctx.lineJoin = 'round'
+            ctx.lineWidth = px
+            for (let i = 0; i < moves.length; i++) {
+                ctx.beginPath()
+                if (moves[i] && i) {
+                    ctx.moveTo(x[i - 1], y[i - 1])
+                } else {
+                    ctx.moveTo(x[i] - 1, y[i])
+                }
+                ctx.lineTo(x[i], y[i])
+                ctx.closePath()
+                ctx.stroke()
+            }
+        }
+        const drawLine = (x1, y1, x2, y2, color = 'lightgray') => {
+            ctx.beginPath()
+            ctx.strokeStyle = color
+            ctx.lineJoin = 'miter'
+            ctx.lineWidth = 1
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.stroke()
+        }
+        const grid = () => {
+            const w = el.clientWidth
+            const h = el.clientHeight
+            const p = el.clientWidth / px
+            const xStep = w / p
+            const yStep = h / p
+            for (let x = 0; x < w; x += xStep) {
+                drawLine(x, 0, x, h)
+            }
+            for (let y = 0; y < h; y += yStep) {
+                drawLine(0, y, w, y)
+            }
+        }
+        const cell = (x, y, w, h) => {
+            ctx.fillStyle = 'blue'
+            ctx.strokeStyle = 'blue'
+            ctx.lineJoin = 'miter'
+            ctx.lineWidth = 1
+            ctx.rect(x, y, w, h)
+            ctx.fill()
+        }
+        this.reset = () => {
+            isPainting = false
+            x = []
+            y = []
+            moves = []
+            clear()
+        }
+        this.getVector = (debug = false) => {
+            const w = el.clientWidth
+            const h = el.clientHeight
+            const p = el.clientWidth / px
+            const xStep = w / p
+            const yStep = h / p
+            const vector = []
+            for (let x = 0; x < w; x += xStep) {
+                for (let y = 0; y < h; y += yStep) {
+                    const data = ctx.getImageData(x, y, xStep, yStep)
+                    let nonEmptyPixelsCount = 0
+                    for (let i = 0; i < data.data.length; i += 4) {
+                        const isEmpty = data.data[i] === 0
+                        if (!isEmpty) {
+                            nonEmptyPixelsCount += 1
+                        }
+                    }
+                    if (nonEmptyPixelsCount > 1 && debug) {
+                        cell(x, y, xStep, yStep)
+                    }
+                    vector.push(nonEmptyPixelsCount > 1 ? 1 : 0)
+                }
+            }
+            if (debug) {
+                grid()
+            }
+            return vector
+        }
+        el.addEventListener('mousedown', event => {
+            const bounds = event.target.getBoundingClientRect()
+            const x = event.clientX - bounds.left
+            const y = event.clientY - bounds.top
+            isPainting = true
+            addPoint(x, y, false)
+            redraw()
+        })
+        el.addEventListener('mousemove', event => {
+            const bounds = event.target.getBoundingClientRect()
+            const x = event.clientX - bounds.left
+            const y = event.clientY - bounds.top
+            if (isPainting) {
+                addPoint(x, y, true)
+                redraw()
+            }
+        })
+        el.addEventListener('mouseup', () => {
+            isPainting = false
+        })
+        el.addEventListener('mouseleave', () => {
+            isPainting = false
+        })
+    }</script><script defer="defer">/* const data = []  
+        var json = new XMLHttpRequest();
+        json.open('GET', 'data.json', false);
+        data.push(json);
+        alert(data); */
+    const nm11 = new DrawableCanvas(document.getElementById('n11'))
+    const nm12 = new DrawableCanvas(document.getElementById('n12'))
+    const nm13 = new DrawableCanvas(document.getElementById('n13'))
+    const nm21 = new DrawableCanvas(document.getElementById('n21'))
+    const nm22 = new DrawableCanvas(document.getElementById('n22'))
+    const nm23 = new DrawableCanvas(document.getElementById('n23'))
+    const nm31 = new DrawableCanvas(document.getElementById('n31'))
+    const nm32 = new DrawableCanvas(document.getElementById('n32'))
+    const nm33 = new DrawableCanvas(document.getElementById('n33'))
+    const gc = new DrawableCanvas(document.getElementById('g'))
+    const net = new brain.NeuralNetwork()
+    train.addEventListener('click', () => {
+        alert(nm11.getVector(dbg.checked));
+        const data = []
+        data.push({ input: nm11.getVector(dbg.checked), output: { 1: 1 } })
+        data.push({ input: nm12.getVector(dbg.checked), output: { 1: 1 } })
+        data.push({ input: nm13.getVector(dbg.checked), output: { 1: 1 } })
+        data.push({ input: nm21.getVector(dbg.checked), output: { 2: 1 } })
+        data.push({ input: nm22.getVector(dbg.checked), output: { 2: 1 } })
+        data.push({ input: nm23.getVector(dbg.checked), output: { 2: 1 } })
+        data.push({ input: nm31.getVector(dbg.checked), output: { 3: 1 } })
+        data.push({ input: nm32.getVector(dbg.checked), output: { 3: 1 } })
+        data.push({ input: nm33.getVector(dbg.checked), output: { 3: 1 } })
+        const result = net.train(data, { log: true })
+        err.innerHTML = result.error
+        iterations.innerHTML = result.iterations
+        res.removeAttribute('style')
+    })
+    guess.addEventListener('click', () => {
+        const result = brain.likely(gc.getVector(), net)
+        alert(result)
+        gc.reset()
+    })</script><script>!function(a){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],p=0,l=[];p<n.length;p++)t=n[p],Object.prototype.hasOwnProperty.call(i,t)&&i[t]&&l.push(i[t][0]),i[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(a[r]=o[r]);for(s&&s(e);l.length;)l.shift()();return c.push.apply(c,u||[]),f()}function f(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==i[u]&&(n=!1)}n&&(c.splice(r--,1),e=p(p.s=t[0]))}return e}var t={},i={1:0},c=[];function p(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return a[e].call(r.exports,r,r.exports,p),r.l=!0,r.exports}p.m=a,p.c=t,p.d=function(e,r,t){p.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},p.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},p.t=function(r,e){if(1&e&&(r=p(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(p.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)p.d(t,n,function(e){return r[e]}.bind(null,n));return t},p.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return p.d(r,"a",r),r},p.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},p.p="./";var r=window.webpackJsonpvk_app=window.webpackJsonpvk_app||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;f()}([])</script><script src="./static/js/2.235d325b.chunk.js"></script><script src="./static/js/main.1915b0ed.chunk.js"></script></body></html>
